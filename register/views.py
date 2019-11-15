@@ -8,10 +8,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from .mlmodel import mlmodelclass
 import cv2
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 class UserList(APIView):
-
+    permission_classes = (IsAuthenticated,) 
+    
     def get(self, request):
         param_value = request.GET.get('id')
         search_key = request.GET.get('search')
