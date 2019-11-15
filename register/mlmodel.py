@@ -3,6 +3,7 @@ import pandas as pd
 import os
 cwd = os.getcwd()
 
+
 class mlmodelclass():
 
     def predict_salary(self,exp):
@@ -19,6 +20,8 @@ class mlmodelclass():
         from sklearn.linear_model import LinearRegression
         regressor = LinearRegression()
         regressor.fit(X_train, y_train)
+
+
 
         a = np.array(exp_list)
         Salary_pred = [regressor.predict(a.reshape(-1,1))]

@@ -7,6 +7,7 @@ from .serializer import UserSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from .mlmodel import mlmodelclass
+import cv2
 
 # Create your views here.
 class UserList(APIView):
@@ -23,21 +24,35 @@ class UserList(APIView):
         if search_key != None:
             filter_user = User.objects.filter(userName__contains=search_key) 
             serializer = UserSerializer(filter_user, many=True)
-            pridictlist = mlmodelclass.predict_salary(self,1.5)
-            print("&&&&&&&&&&&&&&  > ",pridictlist)
+            # pridictlist = mlmodelclass.predict_salary(self,1.5)
+            # print("&&&&&&&&&&&&&&  > ",pridictlist)
             return Response({"User": serializer.data})
+        
+        camera = cv2.VideoCapture(0)
+        for i in range(5):
+            return_value, image = camera.read()
+            cv2.imwrite('mypic'+str(i)+'.png', image)
+        del(camera)
 
         users = User.objects.all().order_by('userName')
         serializer = UserSerializer(users, many=True)
         return Response({"User": serializer.data})
     
     def post(self,request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response("ENTRY CERATED", status=status.HTTP_201_CREATED)
+        username = (request.data).get('userName')
+        email = (request.data).get('email')
+        contact = (request.data).get('contact')
+        exp = (request.data).get('exp')
+        pridictlist = mlmodelclass.predict_salary(self,exp)
+        User.objects.create(userName=username,email=email,contact=contact,exp=exp,salary=pridictlist[0])
+
+        # serializer = UserSerializer(data=request.data)
+        # print("====> ",serializer.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response("ENTRY CERATED", status=status.HTTP_201_CREATED)
         # Songs.objects.create(title=title,artist=artist)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response("ENTRY CERATED", status=status.HTTP_201_CREATED)
     
     def put(self, request):
         users = User.objects.all()
